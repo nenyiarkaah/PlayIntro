@@ -1,14 +1,12 @@
-@(val1: Option[Int])
-<html>
-    <head>
+@(val1: Option[Double], form: Form[calcData])
+@import helper._
 
-    </head>
-    <body>
-        <form action="/process">
-            <input type="number" name="val1">
-            <input name="val2">
-            <input type="nonEmptyText(3,25)" name="val3">
-            <input type="submit">
-        </form>
-    </body>
-</html>
+@main("Index") {
+
+    <form action="/process">
+        <input type="requiredNumber" name="val1" required>
+        <input type="requiredNumber" name="val2" required>
+        <input type="submit">
+    </form>
+    <p>@val1</p>
+}

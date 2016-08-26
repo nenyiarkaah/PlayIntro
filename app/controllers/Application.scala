@@ -1,17 +1,16 @@
 package controllers
 
-import play.api._
-import play.api.data.{Form, Forms, Mapping}
+import play.api.data._
 import play.api.data.Forms._
 import play.api.mvc._
-import models._
+import models.{calcData, _}
 
 import scala.util.Try
 
 class Application extends Controller {
 
-  def index = Action {
-    Ok(views.html.index(None))
+  def index = Action { implicit request =>
+    Ok(views.html.index(None, calcForm))
   }
 
   def processeasy = Action { implicit request =>
@@ -29,31 +28,19 @@ class Application extends Controller {
   def process = Action (parse.form(calcForm)) { implicit request =>
 
     val result = request.body
-    if (calcForm.hasErrors) {
-      BadRequest(views.html.index(None))
-    }
-    else{
-      Ok(views.html.index(Option(result.val1 + result.val2)))
-    }
-
-
-
+      Ok(views.html.index(Option(result.val1 + result.val2), calcForm))
   }
 
-
-  val requiredNumber: Mapping[Int] = Forms.nonEmptyText
-    .verifying("Must be numeric", i => Try(i.toInt).isSuccess || i.isEmpty)
-    .transform[Int](_.toInt, _.toString)
+  val requiredNumber: Mapping[Double] = Forms.nonEmptyText
+    .verifying("Must be numeric", i => Try(i.toDouble).isSuccess || i.isEmpty)
+    .transform[Double](_.toInt, _.toString)
 
   val calcForm = Form(
     mapping(
       "val1" -> requiredNumber,
-      "val2" -> requiredNumber,
-      "val3" -> nonEmptyText(5,25)
+      "val2" -> requiredNumber
     )
     (calcData.apply)(calcData.unapply)
   )
-  val form = Form(mapping("orderBy" -> requiredNumber)(identity)(Some(_)))
-
 
 }
